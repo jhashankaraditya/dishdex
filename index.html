@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dishdex | The Ultimate Recipe Website</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Dishdex</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Recipe</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" name="q" type="search" placeholder="Search" aria-label="Search">
+                    <input class="form-control me-2" name="page" type="hidden" value="1" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="container row mx-auto my-4">
+        <div id="content" class="row mx-2">
+            <!-- card starts -->
+            <div class="card m-2" style="width: 18rem;">
+                <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+            <!-- card ends -->
+        </div>
+    </div>
+    <div class="navigate d-flex justify-content-center">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link mx-2" id="pre" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link mx-2" id="next" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <script>
+        let articlesperpage=8;
+        let totalpages;
+        let query = window.location.search.split('?')[1].split('&')[0].split('=')[1]
+        let page = parseInt(window.location.search.split('?')[1].split('&')[1].split('=')[1])
+        console.log(query, page)
+        const fetchrecipe = async (query, pageno) => {
+            let a = await fetch(`https://api.spoonacular.com/recipes/complexSearch?apiKey=9aecd9f83f964d6b97156ae8d2930692&query=${query}`)
+            let b = await a.json()
+            let str = ''
+            for (let result of b.results) {
+                let c = await fetch(`https://api.spoonacular.com/recipes/${result.id}/information?apiKey=9aecd9f83f964d6b97156ae8d2930692`)
+                let d = await c.json()
+                str = str + `
+                <div class="card m-2" style="width: 18rem;">
+            <img src="${d.image}" class="card-img-top" alt="dishdex-img">
+            <div class="card-body">
+                <h5 class="card-title m-2">${d.title}</h5>
+                <p class="card-text">${d.summary}</p>
+                <a target="_blank" href="${d.sourceUrl}" class="btn btn-primary">Click for Recipe</a>
+                <a target="_blank" href="${d.spoonacularSourceUrl}" class="btn btn-primary">Detailed Information</a>
+            </div>
+        </div>
+                `
+            }content.innerHTML=str;
+            totalpages=Math.ceil(b.results/articlesperpage);
+            pre.href=`/?q=${query}&page=${page-1}`;
+            next.href=`/?q=${query}&page=${page+1}`;
+        }
+        fetchrecipe(query, page)
+    </script>
+</body>
+
+</html>
